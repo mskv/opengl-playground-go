@@ -1,38 +1,34 @@
-package program
+package draw
 
 import (
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-// BasicProgram blabla
 type BasicProgram struct {
 	GlProgram uint32
 
 	uModelToProjection int32
 }
 
-// NewBasicProgram blabla
-func NewBasicProgram() (*BasicProgram, error) {
-	var result BasicProgram
-
+func (p *BasicProgram) Init() error {
 	glProgram, err := buildProgram(vertexShaderSource, fragmentShaderSource)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	result.GlProgram = glProgram
-	result.uModelToProjection = gl.GetUniformLocation(glProgram, gl.Str("u_modelToProjection\x00"))
+	p.GlProgram = glProgram
+	p.uModelToProjection = gl.GetUniformLocation(glProgram, gl.Str("u_modelToProjection\x00"))
 
-	return &result, nil
+	gl.BindAttribLocation(glProgram, PositionAttributeLocation, gl.Str("in_position\x00"))
+
+	return nil
 }
 
-// Use blabla
 func (p *BasicProgram) Use() {
 	gl.UseProgram(p.GlProgram)
 }
 
-// SetUniformModelToProjection blabla
 func (p *BasicProgram) SetUniformModelToProjection(modelToProjection *mgl32.Mat4) {
 	gl.UniformMatrix4fv(p.uModelToProjection, 1, false, &modelToProjection[0])
 }
