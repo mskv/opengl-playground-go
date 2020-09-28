@@ -46,6 +46,10 @@ func main() {
 		panic(err)
 	}
 
+	gl.Enable(gl.DEPTH_TEST)
+	gl.DepthFunc(gl.LESS)
+	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
+
 	renderNo := 0
 	for !window.ShouldClose() {
 		if renderNo%50 == 0 {
@@ -53,7 +57,7 @@ func main() {
 		}
 		renderNo++
 
-		gl.Clear(gl.COLOR_BUFFER_BIT)
+		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 		drawSystem.Run()
 
 		window.SwapBuffers()

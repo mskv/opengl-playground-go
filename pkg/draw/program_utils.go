@@ -7,7 +7,7 @@ import (
 	"github.com/go-gl/gl/v4.1-core/gl"
 )
 
-func buildProgram(vertexShaderSource string, fragmentShaderSource string) (uint32, error) {
+func buildProgram(vertexShaderSource string, fragmentShaderSource string, preLinkCb func(uint32)) (uint32, error) {
 	vertexShader, err := compileShader(vertexShaderSource, gl.VERTEX_SHADER)
 	if err != nil {
 		return 0, err
@@ -21,6 +21,7 @@ func buildProgram(vertexShaderSource string, fragmentShaderSource string) (uint3
 	program := gl.CreateProgram()
 	gl.AttachShader(program, vertexShader)
 	gl.AttachShader(program, fragmentShader)
+	preLinkCb(program)
 	gl.LinkProgram(program)
 
 	var status int32

@@ -46,9 +46,11 @@ func (drawSystem *DrawSystem) Run() {
 	modelToWorld := mgl32.Ident4()
 	modelToView := worldToView.Mul4(modelToWorld)
 	modelToProjection := viewToProjection.Mul4(modelToView)
+	modelToViewInverseTranspose := modelToView.Inv().Transpose()
 
 	drawSystem.BasicProgram.Use()
 	drawSystem.BasicProgram.SetUniformModelToProjection(&modelToProjection)
+	drawSystem.BasicProgram.SetUniformModelToViewInverseTranspose(&modelToViewInverseTranspose)
 
 	gl.DrawElements(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_SHORT, gl.PtrOffset(0))
 }
