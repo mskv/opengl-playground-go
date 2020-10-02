@@ -1,58 +1,46 @@
-package draw
+package core
 
-import (
-	"github.com/go-gl/gl/v4.1-core/gl"
-	"github.com/go-gl/mathgl/mgl32"
-)
+import "github.com/go-gl/mathgl/mgl32"
 
 type System struct {
-	WindowWidth  int
-	WindowHeight int
-
-	BasicProgram BasicProgram
-	MeshStore    MeshStore
-	VaoStore     VaoStore
+	entityStore   EntityStore
+	drawSystem    DrawSystem
+	physicsSystem PhysicsSystem
 }
 
 func (system *System) Init(windowWidth int, windowHeight int) error {
-	system.WindowWidth = windowWidth
-	system.WindowHeight = windowHeight
-
-	if err := system.BasicProgram.Init(); err != nil {
+	if err := system.drawSystem.Init(windowWidth, windowHeight); err != nil {
 		return err
 	}
-	system.MeshStore.Init()
-	system.VaoStore.Init()
 
 	cubePositions, cubeNormals, cubeIndices := buildCubeMesh()
-	mesh, err := system.MeshStore.RegisterMesh("cube", cubePositions, cubeNormals, cubeIndices)
+	cubeMesh, err := system.drawSystem.MeshStore.RegisterMesh("cube", cubePositions, cubeNormals, cubeIndices)
 	if err != nil {
 		panic(err)
 	}
 
-	system.VaoStore.RegisterMesh(mesh)
+	system.drawSystem.VaoStore.RegisterMesh(cubeMesh)
+
+	system.entityStore.Init()
+
+	entity := Entity{
+		meshID: cubeMesh.ID,
+		transform: Transform{
+			Position: mgl32.Vec3{0, 0, 0},
+			Rotation: mgl32.Vec3{0, 0, 0},
+			Scale:    mgl32.Vec3{1, 1, 1},
+		},
+	}
+
+	system.entityStore.RegisterEntity(entity)
+
+	system.physicsSystem.Init()
 
 	return nil
 }
 
 func (system *System) Run() {
-	mesh := system.MeshStore.GetMeshByName("cube")
-	vao := system.VaoStore.GetVaoByMeshID(mesh.ID)
-
-	gl.BindVertexArray(vao)
-
-	worldToView := mgl32.LookAtV(mgl32.Vec3{3, 3, 3}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0})
-	viewToProjection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(system.WindowWidth)/float32(system.WindowHeight), 0.1, 10.0)
-	modelToWorld := mgl32.Ident4()
-	modelToView := worldToView.Mul4(modelToWorld)
-	modelToProjection := viewToProjection.Mul4(modelToView)
-	modelToViewInverseTranspose := modelToView.Inv().Transpose()
-
-	system.BasicProgram.Use()
-	system.BasicProgram.SetUniformModelToProjection(&modelToProjection)
-	system.BasicProgram.SetUniformModelToViewInverseTranspose(&modelToViewInverseTranspose)
-
-	gl.DrawElements(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_SHORT, gl.PtrOffset(0))
+	system.drawSystem.Run(&system.entityStore)
 }
 
 func buildCubeMesh() ([]float32, []float32, []uint16) {

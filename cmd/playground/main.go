@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"example.com/playground/playground/pkg/draw"
+	"example.com/playground/playground/pkg/core"
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
@@ -41,8 +41,8 @@ func main() {
 	version := gl.GoStr(gl.GetString(gl.VERSION))
 	fmt.Printf("OpenGL version: %#v\n", version)
 
-	drawSystem := new(draw.System)
-	if err := drawSystem.Init(windowWidth, windowHeight); err != nil {
+	system := new(core.System)
+	if err := system.Init(windowWidth, windowHeight); err != nil {
 		panic(err)
 	}
 
@@ -58,7 +58,7 @@ func main() {
 		renderNo++
 
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-		drawSystem.Run()
+		system.Run()
 
 		window.SwapBuffers()
 		glfw.PollEvents()

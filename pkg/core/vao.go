@@ -1,4 +1,4 @@
-package draw
+package core
 
 import (
 	"github.com/go-gl/gl/v4.1-core/gl"

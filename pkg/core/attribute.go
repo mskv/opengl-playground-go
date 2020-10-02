@@ -1,4 +1,4 @@
-package draw
+package core
 
 type AttributeLocation = uint32
 

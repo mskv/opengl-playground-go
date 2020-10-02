@@ -1,4 +1,4 @@
-package draw
+package core
 
 import (
 	"fmt"
@@ -44,6 +44,7 @@ func (meshStore *MeshStore) RegisterMesh(name string, positions []float32, norma
 }
 
 func (meshStore *MeshStore) GetMeshByID(meshID MeshID) *Mesh {
+	// TODO: handle capacity
 	return &meshStore.meshes[meshID]
 }
 
