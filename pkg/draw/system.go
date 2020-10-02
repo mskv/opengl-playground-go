@@ -5,7 +5,7 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-type DrawSystem struct {
+type System struct {
 	WindowWidth  int
 	WindowHeight int
 
@@ -14,43 +14,43 @@ type DrawSystem struct {
 	VaoStore     VaoStore
 }
 
-func (drawSystem *DrawSystem) Init(windowWidth int, windowHeight int) error {
-	drawSystem.WindowWidth = windowWidth
-	drawSystem.WindowHeight = windowHeight
+func (system *System) Init(windowWidth int, windowHeight int) error {
+	system.WindowWidth = windowWidth
+	system.WindowHeight = windowHeight
 
-	if err := drawSystem.BasicProgram.Init(); err != nil {
+	if err := system.BasicProgram.Init(); err != nil {
 		return err
 	}
-	drawSystem.MeshStore.Init()
-	drawSystem.VaoStore.Init()
+	system.MeshStore.Init()
+	system.VaoStore.Init()
 
 	cubePositions, cubeNormals, cubeIndices := buildCubeMesh()
-	mesh, err := drawSystem.MeshStore.RegisterMesh("cube", cubePositions, cubeNormals, cubeIndices)
+	mesh, err := system.MeshStore.RegisterMesh("cube", cubePositions, cubeNormals, cubeIndices)
 	if err != nil {
 		panic(err)
 	}
 
-	drawSystem.VaoStore.RegisterMesh(mesh)
+	system.VaoStore.RegisterMesh(mesh)
 
 	return nil
 }
 
-func (drawSystem *DrawSystem) Run() {
-	mesh := drawSystem.MeshStore.GetMeshByName("cube")
-	vao := drawSystem.VaoStore.GetVaoByMeshID(mesh.ID)
+func (system *System) Run() {
+	mesh := system.MeshStore.GetMeshByName("cube")
+	vao := system.VaoStore.GetVaoByMeshID(mesh.ID)
 
 	gl.BindVertexArray(vao)
 
 	worldToView := mgl32.LookAtV(mgl32.Vec3{3, 3, 3}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0})
-	viewToProjection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(drawSystem.WindowWidth)/float32(drawSystem.WindowHeight), 0.1, 10.0)
+	viewToProjection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(system.WindowWidth)/float32(system.WindowHeight), 0.1, 10.0)
 	modelToWorld := mgl32.Ident4()
 	modelToView := worldToView.Mul4(modelToWorld)
 	modelToProjection := viewToProjection.Mul4(modelToView)
 	modelToViewInverseTranspose := modelToView.Inv().Transpose()
 
-	drawSystem.BasicProgram.Use()
-	drawSystem.BasicProgram.SetUniformModelToProjection(&modelToProjection)
-	drawSystem.BasicProgram.SetUniformModelToViewInverseTranspose(&modelToViewInverseTranspose)
+	system.BasicProgram.Use()
+	system.BasicProgram.SetUniformModelToProjection(&modelToProjection)
+	system.BasicProgram.SetUniformModelToViewInverseTranspose(&modelToViewInverseTranspose)
 
 	gl.DrawElements(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_SHORT, gl.PtrOffset(0))
 }

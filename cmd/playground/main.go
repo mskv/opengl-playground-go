@@ -41,7 +41,7 @@ func main() {
 	version := gl.GoStr(gl.GetString(gl.VERSION))
 	fmt.Printf("OpenGL version: %#v\n", version)
 
-	drawSystem := new(draw.DrawSystem)
+	drawSystem := new(draw.System)
 	if err := drawSystem.Init(windowWidth, windowHeight); err != nil {
 		panic(err)
 	}
