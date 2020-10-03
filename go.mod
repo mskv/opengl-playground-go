@@ -1,4 +1,4 @@
-module example.com/playground/playground
+module github.com/mskv/opengl-playground-go
 
 go 1.14
 

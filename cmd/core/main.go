@@ -5,9 +5,9 @@ import (
 	"runtime"
 	"time"
 
-	"example.com/playground/playground/pkg/core"
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/glfw/v3.3/glfw"
+	"github.com/mskv/opengl-playground-go/pkg/core"
 )
 
 func init() {
