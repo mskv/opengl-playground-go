@@ -7,6 +7,7 @@ type EntityStore struct {
 type Entity struct {
 	ID        int
 	transform Transform
+	movement  Movement
 	meshID    MeshID
 }
 

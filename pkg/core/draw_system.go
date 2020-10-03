@@ -25,7 +25,8 @@ func (drawSystem *DrawSystem) Run(entityStore *EntityStore, cameraStore *CameraS
 	worldToView := camera.Transform.Matrix().Inv()
 	viewToProjection := camera.PerspectiveProjection.Matrix()
 
-	for _, entity := range entityStore.Entities {
+	for idx := range entityStore.Entities {
+		entity := &entityStore.Entities[idx]
 		mesh := drawSystem.MeshStore.GetMeshByID(entity.meshID)
 		vao := drawSystem.VaoStore.GetVaoByMeshID(entity.meshID)
 

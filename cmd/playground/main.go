@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"runtime"
+	"time"
 
 	"example.com/playground/playground/pkg/core"
 	"github.com/go-gl/gl/v4.1-core/gl"
@@ -41,24 +42,28 @@ func main() {
 	version := gl.GoStr(gl.GetString(gl.VERSION))
 	fmt.Printf("OpenGL version: %#v\n", version)
 
+	gl.Enable(gl.DEPTH_TEST)
+	gl.DepthFunc(gl.LESS)
+	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
+
 	system := new(core.System)
 	if err := system.Init(windowWidth, windowHeight); err != nil {
 		panic(err)
 	}
 
-	gl.Enable(gl.DEPTH_TEST)
-	gl.DepthFunc(gl.LESS)
-	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
-
 	renderNo := 0
+	programStartNs := time.Now().UnixNano()
 	for !window.ShouldClose() {
+		nowNs := time.Now().UnixNano()
+		elapsedMs := float32(nowNs-programStartNs) / 1000000
+
 		if renderNo%50 == 0 {
-			fmt.Printf("Render number %#v\n", renderNo)
+			fmt.Printf("Render number %#v time %#v\n", renderNo, elapsedMs)
 		}
 		renderNo++
 
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-		system.Run()
+		system.Run(elapsedMs)
 
 		window.SwapBuffers()
 		glfw.PollEvents()

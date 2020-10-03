@@ -45,6 +45,10 @@ func (system *System) Init(windowWidth int, windowHeight int) error {
 			Rotation: mgl32.Vec3{mgl32.DegToRad(0), mgl32.DegToRad(0), 0},
 			Scale:    mgl32.Vec3{1.5, 1.5, 1.5},
 		},
+		movement: Movement{
+			DPosition: mgl32.Vec3{0, 0, 0},
+			DRotation: mgl32.Vec3{mgl32.DegToRad(30), mgl32.DegToRad(60), mgl32.DegToRad(45)},
+		},
 	}
 
 	system.entityStore.RegisterEntity(entity)
@@ -54,7 +58,8 @@ func (system *System) Init(windowWidth int, windowHeight int) error {
 	return nil
 }
 
-func (system *System) Run() {
+func (system *System) Run(elapsedMs float32) {
+	system.physicsSystem.Run(&system.entityStore, elapsedMs)
 	system.drawSystem.Run(&system.entityStore, &system.cameraStore)
 }
 
