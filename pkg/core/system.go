@@ -4,12 +4,13 @@ import "github.com/go-gl/mathgl/mgl32"
 
 type System struct {
 	entityStore   EntityStore
+	cameraStore   CameraStore
 	drawSystem    DrawSystem
 	physicsSystem PhysicsSystem
 }
 
 func (system *System) Init(windowWidth int, windowHeight int) error {
-	if err := system.drawSystem.Init(windowWidth, windowHeight); err != nil {
+	if err := system.drawSystem.Init(); err != nil {
 		return err
 	}
 
@@ -21,14 +22,28 @@ func (system *System) Init(windowWidth int, windowHeight int) error {
 
 	system.drawSystem.VaoStore.RegisterMesh(cubeMesh)
 
+	system.cameraStore.MainCamera = Camera{
+		Transform: Transform{
+			Position: mgl32.Vec3{2, 2, 3},
+			Rotation: mgl32.Vec3{mgl32.DegToRad(-20), 0, 0},
+			Scale:    mgl32.Vec3{1, 1, 1},
+		},
+		PerspectiveProjection: PerspectiveProjection{
+			NearZ:         0.1,
+			FarZ:          1000,
+			FovY:          mgl32.DegToRad(90),
+			AspectRatioXY: float32(windowWidth) / float32(windowHeight),
+		},
+	}
+
 	system.entityStore.Init()
 
 	entity := Entity{
 		meshID: cubeMesh.ID,
 		transform: Transform{
 			Position: mgl32.Vec3{0, 0, 0},
-			Rotation: mgl32.Vec3{0, 0, 0},
-			Scale:    mgl32.Vec3{1, 1, 1},
+			Rotation: mgl32.Vec3{mgl32.DegToRad(0), mgl32.DegToRad(0), 0},
+			Scale:    mgl32.Vec3{1.5, 1.5, 1.5},
 		},
 	}
 
@@ -40,7 +55,7 @@ func (system *System) Init(windowWidth int, windowHeight int) error {
 }
 
 func (system *System) Run() {
-	system.drawSystem.Run(&system.entityStore)
+	system.drawSystem.Run(&system.entityStore, &system.cameraStore)
 }
 
 func buildCubeMesh() ([]float32, []float32, []uint16) {
@@ -53,7 +68,7 @@ func buildCubeMesh() ([]float32, []float32, []uint16) {
 	v6 := mgl32.Vec3{0, 1, 1}
 	v7 := mgl32.Vec3{1, 1, 1}
 	farN := v2.Sub(v0).Cross(v1.Sub(v0)).Normalize()
-	leftN := v4.Sub(v0).Cross(v1.Sub(v2)).Normalize()
+	leftN := v4.Sub(v0).Cross(v2.Sub(v0)).Normalize()
 	rightN := v1.Sub(v5).Cross(v7.Sub(v5)).Normalize()
 	bottomN := v1.Sub(v0).Cross(v4.Sub(v0)).Normalize()
 	topN := v6.Sub(v2).Cross(v3.Sub(v2)).Normalize()

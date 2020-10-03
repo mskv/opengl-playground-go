@@ -65,7 +65,7 @@ in vec3 v_normal;
 out vec4 out_color;
 
 void main() {
-	float lightContribution = dot(normalize(v_normal), -1.0 * normalize(vec3(-0.5, -0.5, -0.5)));
+	float lightContribution = dot(normalize(v_normal), -1.0 * normalize(vec3(0, -1.0, 0)));
 
   out_color = vec4(1.0, 0.0, 0.0, 1.0);
   out_color.rgb *= lightContribution;
